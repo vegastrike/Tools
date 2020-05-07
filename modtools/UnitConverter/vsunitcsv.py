@@ -12,7 +12,7 @@
 # Description: Provides various methods to read, write, and update units information
 #
 # Author: pyramid
-# Version: 2008-10-31 | v0.38
+# Version: 2011-04-14 | v0.41
 # Contact: pyramid@sapo.pt
 #---------------------------------------------------------------------------------
 # Features:
@@ -139,11 +139,15 @@ class VsUnitCsv:
     return header
 
   def getUnitKey(self, currentUnitKey='', offset=0):
-  #reads next unit from given current unit key
+    #reads next unit from given current unit key
     if currentUnitKey=='':
-      index = 3
+      index = 2 + offset
     else:
       index = self.getUnitIndex(currentUnitKey) + offset
+    if index<3:
+      index = len(self.records) - 1
+    if index>len(self.records)-1:
+      index = 3
     while len(self.records[index])==0:
       index += offset
     unitKey = self.records[index][0]

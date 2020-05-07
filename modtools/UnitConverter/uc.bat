@@ -2,4 +2,4 @@
 REM ----------------------------------------------------
 REM Windows command script for running UnitConverter
 REM ----------------------------------------------------
-python unitconverter.py
+C:\Programs\python27\python.exe unitconverter.py

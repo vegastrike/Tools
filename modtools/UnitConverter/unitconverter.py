@@ -12,7 +12,7 @@
 # Description: Takes obj file inputs master textures, creates bfxm output
 #              Also converts textures to dds
 # Author: pyramid
-# Version: 2011-04-07 | v0.40
+# Version: 2011-04-14 | v0.41
 # Contact: pyramid@sapo.pt
 #---------------------------------------------------------------------------------
 # Features:
@@ -986,9 +986,9 @@ class UnitConverter:
     def deleteEntry(self, variable):
     # deletes content of a display variable
       variable.set("")
-      #self.setParameters()
-      #self.refreshTextureInfo()
-      #self.workspaceWrite()
+      self.setParameters()
+      self.refreshTextureInfo()
+      self.workspaceWrite()
 
     def deleteFactionEntry(self):
     # deletes faction variable and textures
@@ -1493,6 +1493,8 @@ class UnitConverter:
 
     def getNextUnit(self):
     #reads next unit from units.csv and displays it
+      if self.unitname.get()=='':
+        print "*"+self.unitname.get()+"#"
       self.unitcsv = VsUnitCsv(self.vegastrike.get()) # get class instance
       self.unitname.set(self.unitcsv.getUnitKey(currentUnitKey=self.unitname.get(), offset=+1))
       self.readUnitCsv()
@@ -2737,7 +2739,7 @@ class UnitConverter:
       self.displayTextBox(self.f4, 2, self.help, DISABLED)
       # row frame
       iframe = Frame(f4, relief=FLAT)
-      Label(iframe, text="Version: 2011-04-07 | v0.40 | Vega Strike team").pack(fill=BOTH, padx=5)
+      Label(iframe, text="Version: 2011-04-14 | v0.41 | Vega Strike team").pack(fill=BOTH, padx=5)
       Label(iframe, text="http://vegastrike.sourceforge.net/").pack(fill=BOTH, padx=5)
       Label(iframe, text="pyramid users sourceforge net | pyramid sapo pt").pack(fill=BOTH, padx=5)
       iframe.pack(expand=1, fill=X, pady=0, padx=5)
@@ -2803,7 +2805,8 @@ def OnExit(*args):
   #print "Looks sharp, Chief" #v0.35
   #print "May the UnitConverter be with you" #v0.36 / v0.37
   #print "Goodby to conversion magic" #v0.38
-  print "Go, model, go!" #v0.39
+  #print "Go, model, go!" #v0.39, v0.40
+  print "Oh, oh. Roger, roger." #v0.41
 
 # register exit handler
 atexit.register(OnExit)

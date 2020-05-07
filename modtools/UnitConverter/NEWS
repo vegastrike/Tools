@@ -10,6 +10,13 @@ For forum discussion, visit:
     http://vegastrike.sourceforge.net/forums/viewtopic.php?t=11885
 -------------------------------------------------------------------------------
 
+Changes from version 0.40 to version 0.41 from 2011-04-14
+==========================================================
+
+    [pyramid <pyramid3d@users.sourceforge.net>]
+    * improved units browsing across record boundaries
+    * fixed deleting of textures from workspace
+
 Changes from version 0.39 to version 0.40 from 2011-04-08
 ==========================================================
 
