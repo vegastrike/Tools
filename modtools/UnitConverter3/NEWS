@@ -5,10 +5,25 @@ Description: Takes obj file inputs master textures, creates bfxm output and
              converts textures to dds, updates parameters in units.csv
 
 For user manual, please go to:
-    http://vegastrike.sourceforge.net/wiki/Development:Tools:UnitConverter
+    https://wiki.vega-strike.org/Development:Tools:UnitConverter
 For forum discussion, visit:
-    http://vegastrike.sourceforge.net/forums/viewtopic.php?t=11885
+    https://forums.vega-strike.org/viewtopic.php?t=11885
 -------------------------------------------------------------------------------
+
+Changes from version 0.202008.01 to version 0.202008.02
+==========================================================
+
+  [Evert Vorster](https://github.com/evertvorster)
+  * unitconverter.py: Patch to enlarge the font size in UnitConverter
+    during creation of the application window.
+  [pyramid](https://github.com/pyramid3d)
+  * Updated about tab information
+
+Changes from version 0.53 to version 0.202008.01
+==========================================================
+
+  [CLoneWolf](https://github.com/CLoneWolf)
+  * Yay! UnitConverter3 is now working! Applied CLoneWolf's patches.
 
 Changes from version 0.41 to version 0.53 from 20200-05-07
 ==========================================================

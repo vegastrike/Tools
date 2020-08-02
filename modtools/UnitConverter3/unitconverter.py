@@ -2,7 +2,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #---------------------------------------------------------------------------------
-# @version: 2020-05-07 | v0.53
+# @version: v0.202008.02
 # @created: 2008-08-05
 # @author : pyramid
 # @contact: pyramid@sapo.pt
@@ -2751,19 +2751,19 @@ class UnitConverter:
       self.displayHeader(f4,"Vega Strike Unit Converter (obj->bfxm)") # header line
       # HELP
       self.help = "Get the latest version:\n"
-      self.help += "'svn co https://vegastrike.svn.sourceforge.net/svnroot/vegastrike/trunk/modtools/UnitConverter'"
+      self.help += "'git clone https://github.com/vegastrike/Tools/tree/master/modtools/UnitConverter3'"
       self.displayTextBox(self.f4, 2, self.help, DISABLED)
       # row frame
       iframe = Frame(f4, relief=FLAT)
-      Label(iframe, text="Version: 2011-04-14 | v0.41 | Vega Strike team").pack(fill=BOTH, padx=5)
-      Label(iframe, text="http://vegastrike.sourceforge.net/").pack(fill=BOTH, padx=5)
-      Label(iframe, text="pyramid users sourceforge net | pyramid sapo pt").pack(fill=BOTH, padx=5)
+      Label(iframe, text="version: 0.202008.02 | Vega Strike team").pack(fill=BOTH, padx=5)
+      Label(iframe, text="https://www.vega-strike.org/").pack(fill=BOTH, padx=5)
+      Label(iframe, text="author: https://github.com/pyramid3d | https://openteq.wordpress.com/").pack(fill=BOTH, padx=5)
       iframe.pack(expand=1, fill=X, pady=0, padx=5)
       # LICENSE
-      self.help = "Copyright (C) 2008 Vega Strike team\n"
-      self.help += "Contact: hellcatv@users.sourceforge.net\n"
-      self.help += "Internet: http://vegastrike.sourceforge.net/\n"
-      self.help += "Forums: http://vegastrike.sourceforge.net/forums/\n\n"
+      self.help = "Copyright (C) 2008-2020 Vega Strike team\n"
+      self.help += "Contact: https://gitter.im/vegastrike/community\n"
+      self.help += "Internet: https://www.vega-strike.org/\n"
+      self.help += "Forums: https://forums.vega-strike.org/\n\n"
       self.help += "This program is free software; you can redistribute it and/or\n"
       self.help += "modify it under the terms of the GNU General Public License\n"
       self.help += "as published by the Free Software Foundation; either version 3\n"
@@ -2804,6 +2804,7 @@ def exitApp():
 
 # create application window
 root = Tk()
+root.tk.call('tk', 'scaling', 1.0)
 root.protocol("WM_DELETE_WINDOW", exitApp)
 root.option_add("*Dialog.msg.wrapLength", "600px")
 root.option_add("*Dialog.msg.Font", "helvetica 10 normal")
@@ -2823,7 +2824,8 @@ def OnExit(*args):
   #print "Goodby to conversion magic" #v0.38
   #print "Go, model, go!" #v0.39, v0.40
   #print("Oh, oh. Roger, roger.") #v0.41
-  print("UnitConverter is a harsh mistress.") #v0.53 (inline with latest vega strike release 0.5.3)
+  #print("UnitConverter is a harsh mistress.") #v0.53 (inline with latest vega strike release 0.5.3)
+  print("You can be any model, as long as you know the vertices.") #v0.202008.02
 
 # register exit handler
 atexit.register(OnExit)
