@@ -85,6 +85,7 @@ from tkinter import *
 #import tkMessageBox
 from tkinter import filedialog
 from tkinter import messagebox
+import tkinter as tk
 import configparser
 import shutil               # for copying file backups
 import os.path              # for path splitting
@@ -214,7 +215,7 @@ class UnitConverter:
         mastertexture = self.texmaster4.get()
       if error==1:
         print("Error (TEXTURE) = ", self.objpath.get()+"/"+mastertexture)
-        tkMessageBox.showwarning("Warning",
+        messagebox.showwarning("Warning",
           "The master texture ("+self.objpath.get()+"/"+mastertexture+") contains spaces.\n" +
           "Nvcompress will not recognize this texture for dds compression.\n" +
           "Please substitute the spaces (' ') with underscores ('_') or rename the texture so that it does not contain any spaces.\n" +
@@ -239,7 +240,7 @@ class UnitConverter:
           mastertexture = self.texmaster4.get()
         if error==1:
           print("Error (TEXTURE) = ", self.objpath.get()+"/"+mastertexture)
-          tkMessageBox.showwarning("Warning",
+          messagebox.showwarning("Warning",
             "The master texture ("+mastertexture+") is not of png type\n" +
             "Nvcompress will not recognize this texture for dds compression.\n" +
             "Please convert your file to png and proceed when finished.")
@@ -280,7 +281,7 @@ class UnitConverter:
     #--------------------------------------------------------------------------------------------
     def iniRead(self):
     # read and set variables from ini file
-      config = ConfigParser.ConfigParser()
+      config = configparser.ConfigParser()
       config.read(self.appdir+"/unitconverter.ini")
       try:
         self.mesherpath.set(config.get("Config", "MESHER_PATH"))
@@ -300,7 +301,7 @@ class UnitConverter:
       except:
         self.vegastrike.set("")
         print("iniRead: config variable Config/VEGASTRIKE_ROOT not yet set")
-        tkMessageBox.showwarning("Warning",
+        messagebox.showwarning("Warning",
           "The UnitConverter is not yet configured properly.\n" +
           "Please go to configure and set the vegastrike data directory and the mesher and nvcompress paths.")
       try:
@@ -339,7 +340,7 @@ class UnitConverter:
 
     def iniWrite(self):
     # write variables to ini file
-      config = ConfigParser.ConfigParser()
+      config = configparser.ConfigParser()
       # set variables
       config.add_section("Config")
       config.set("Config", "MESHER_PATH", self.mesherpath.get())
@@ -361,7 +362,7 @@ class UnitConverter:
     def workspaceRead(self):
     # read and set variables from ini file
       print("Reading workspace")
-      wsConfig = ConfigParser.ConfigParser()
+      wsConfig = configparser.ConfigParser()
       if self.workdir.get()!='' and self.activemodel.get()!='':
         wsFile = self.workdir.get()+'/'+self.activemodel.get()+'.ini'
         wsConfig.read(wsFile)
@@ -434,13 +435,13 @@ class UnitConverter:
 
     def workspaceWrite(self):
     # write variables to ini file
-      wsConfig = ConfigParser.ConfigParser()
+      wsConfig = configparser.ConfigParser()
       # save models workspace
       if self.workdir.get()!='' and self.unitname.get()!='':
         wsConfig.add_section("Workspace")
-        wsConfig.set("Workspace", "NR_OF_MODELS", len(self.models))
+        wsConfig.set("Workspace", "NR_OF_MODELS", str(len(self.models)))
         wsConfig.set("Workspace", "ACTIVE_MODEL", self.activemodel.get())
-        wsConfig.set("Workspace", "ACTIVE_MODELNR", self.models.index(self.activemodel.get()))
+        wsConfig.set("Workspace", "ACTIVE_MODELNR", str(self.models.index(self.activemodel.get())))
         wsConfig.set("Workspace", "TEXTURE_FACTION", self.faction.get())
         wsConfig.set("Workspace", "UNIT_MODELNAME", self.unitname.get())
         wsConfig.set("Workspace", "HUD_IMAGE", self.hudimage.get())
@@ -451,7 +452,7 @@ class UnitConverter:
           if self.models[i].lower().find('marker')>-1:
             nrsubmodels = 1
           #print "workspaceWrite: nrsubmodels", nrsubmodels
-          wsConfig.set("Workspace", "SUBMODELS_MODEL_"+str(i), nrsubmodels)
+          wsConfig.set("Workspace", "SUBMODELS_MODEL_"+str(i), str(nrsubmodels))
           for s in range(nrsubmodels):
             wsConfig.add_section("MODEL_"+str(i)+"_SUBMODEL_"+str(s))
             for p in range(len(self.PARAMS)):
@@ -472,7 +473,7 @@ class UnitConverter:
     def getPath(self, setstrvar):
     # get a file and return the full address (path+filename)
       #self.changeToWorkdir()
-      file = askopenfilename(initialdir=self.workdir.get(), title="Select A File")
+      file = filedialog.askopenfilename(initialdir=self.workdir.get(), title="Select A File")
       (dirName, fileName) = os.path.split(file)
       (fileBaseName, fileExtension)=os.path.splitext(fileName)
       if file=='':
@@ -521,7 +522,7 @@ class UnitConverter:
       type = imghdr.what(fileAddress)
       if type!='png':
         print("Error (TEXTURE) = ", fileAddress)
-        tkMessageBox.showwarning("Warning",
+        messagebox.showwarning("Warning",
           "The master texture ("+os.path.split(fileAddress)[1]+") is not of png type\n" +
           "Nvcompress will not recognize this texture for dds compression.\n" +
           "Please convert your file to png and proceed when finished.")
@@ -539,7 +540,7 @@ class UnitConverter:
         error = 1
       if error==1:
         print("Error (TEXTURE) = ", fileAddress)
-        tkMessageBox.showwarning("Warning",
+        messagebox.showwarning("Warning",
           "The master texture ("+os.path.split(fileAddress)[1]+") has the dimensions\n" +
           str(width)+","+str(height)+" and is therefore not POT (power-of-two).\n" +
           "Vega Strike will not display this texture correctly.\n" +
@@ -547,7 +548,7 @@ class UnitConverter:
 
     def getFile(self, setstrvar):
     # get a file and return only the filename without path
-      file = askopenfilename(initialdir=self.workdir.get(), title="Select A File")
+      file = filedialog.askopenfilename(initialdir=self.workdir.get(), title="Select A File")
       if file=='':
         return ''
       (dirName, fileName) = os.path.split(file)
@@ -1905,6 +1906,7 @@ class UnitConverter:
       # delete old options
       m = optMenu.children['menu']
       m.delete(0,END)
+      newValues = list(newValues)  # inefficient, but these lists are small
       # set new options
       for i in range(len(newValues)):
         val = newValues[i]
@@ -2203,7 +2205,7 @@ class UnitConverter:
       # options dropdown for faction textures
       iframe = Frame(f2, relief=FLAT)
       Label(iframe, text="Faction", width=10, anchor=E).pack(side=LEFT, padx=5)
-      apply(OptionMenu, (iframe, self.faction) + tuple(self.FACTIONS)).pack(side=LEFT, padx=5)
+      tk.OptionMenu(iframe, self.faction, *(self.FACTIONS)).pack(side=LEFT, padx=5)
       Button(iframe, text='x', command=lambda:self.deleteFactionEntry()).pack(side=LEFT, padx=5)
       iframe.pack(expand=1, fill=X, pady=0, padx=5)
       # row
@@ -2267,14 +2269,14 @@ class UnitConverter:
       iframe = Frame(self.f2, relief=FLAT)
       Label(iframe, text="Technique", width=16, anchor=E).pack(side=LEFT, padx=5)
       self.technique.set(self.defaulttechnique)
-      apply(OptionMenu, (iframe, self.technique) + tuple(self.TECHNIQUES)).pack(side=LEFT, padx=5)
+      tk.OptionMenu(iframe, self.technique, *(self.TECHNIQUES)).pack(side=LEFT, padx=5)
       Entry(iframe, width=30, textvariable=self.technique).pack(side=LEFT, padx=5)
       iframe.pack(expand=1, fill=X, pady=0, padx=5)
       # blend mode
       iframe = Frame(self.f2, relief=FLAT)
       Label(iframe, text="Blend mode", width=16, anchor=E).pack(side=LEFT, padx=5)
       self.blendmode.set(self.BLENDMODES[0])
-      apply(OptionMenu, (iframe, self.blendmode) + tuple(self.BLENDMODES)).pack(side=LEFT, padx=5)
+      tk.OptionMenu(iframe, self.blendmode, *(self.BLENDMODES)).pack(side=LEFT, padx=5)
       #Entry(iframe, width=30, textvariable=self.blendmode).pack(side=LEFT, padx=5)
       iframe.pack(expand=1, fill=X, pady=0, padx=5)
       # PROCESS
@@ -2668,7 +2670,7 @@ class UnitConverter:
       iframe = Frame(self.f7, relief=FLAT)
       Label(iframe, text="Faction", width=16).pack(side=LEFT, padx=5)
       self.missionfaction.set(self.FACTIONS[1])
-      apply(OptionMenu, (iframe, self.missionfaction) + tuple(self.FACTIONS)).pack(side=LEFT, padx=5)
+      tk.OptionMenu(iframe, self.missionfaction, *(self.FACTIONS)).pack(side=LEFT, padx=5)
       Button(iframe, text='View', bg="#BFB8FE", fg="#483855", command=self.testUnitInVegastrike).pack(side=LEFT, padx=5)
       iframe.pack(expand=1, fill=X, pady=0, padx=5)
 
@@ -2709,7 +2711,7 @@ class UnitConverter:
       # techniques
       iframe = Frame(self.f3, relief=FLAT)
       Label(iframe, text="Current Technique", width=16).pack(side=LEFT, padx=5)
-      apply(OptionMenu, (iframe, self.technique) + tuple(self.TECHNIQUES)).pack(side=LEFT, padx=5)
+      tk.OptionMenu(iframe, self.technique, *(self.TECHNIQUES)).pack(side=LEFT, padx=5)
       Button(iframe, text='Save Settings', bg="#BFB8FE", fg="#483855", command=lambda:self.setDefault(self.technique)).pack(side=RIGHT, padx=5)
       iframe.pack(expand=1, fill=X, pady=0, padx=5)
       # units directory structure & bypass compression

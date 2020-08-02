@@ -46,7 +46,7 @@ class VsUnitCsv:
 
     # loads units csv
     print("Reading units.csv = ", self.unitCsvAddress)
-    file = open(self.unitCsvAddress, "rb")
+    file = open(self.unitCsvAddress, "r")
     self.unitscsv = csv.reader(file)
     for row in self.unitscsv:
       #self.recordcnt += 1

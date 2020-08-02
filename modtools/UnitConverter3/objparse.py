@@ -184,7 +184,7 @@ class ObjParse:
         self.objvertices += [[]]
       # get vertices
       elif values[0] == 'v':
-          v = map(float, values[1:4])
+          v = list(map(float, values[1:4]))
           if swapyz:
               v = v[0], v[2], v[1]
           self.vertices.append(v)
@@ -192,7 +192,7 @@ class ObjParse:
             self.objvertices[len(self.objnames)-1].append(v)
       # get normals
       elif values[0] == 'vn':
-          v = map(float, values[1:4])
+          v = list(map(float, values[1:4]))
           if swapyz:
               v = v[0], v[2], v[1]
           self.normals.append(v)
@@ -248,6 +248,7 @@ class ObjParse:
     hei_min = 0
     hei_max = 0
     for vertex in self.vertices:
+      vertex = list(vertex)
       if vertex[2]<len_min:
         len_min = vertex[2]
       if vertex[2]>len_max:
