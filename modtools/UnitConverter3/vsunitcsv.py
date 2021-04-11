@@ -39,8 +39,8 @@ import operator
 
 class VsUnitCsv:
 
-  def __init__(self, vsDataDir):
-    self.unitCsvAddress = vsDataDir+"/units/units.csv"
+  def __init__(self, vsDataDir, vsDataFile="units.csv"):
+    self.unitCsvAddress = vsDataDir+"/units/"+vsDataFile
     #self.recordcnt = 0
     self.records = []
 
@@ -109,7 +109,7 @@ class VsUnitCsv:
 
   def writeUnitCsv(self):
   # writes complete records again to units.csv file
-    file = open(self.unitCsvAddress, "wb")
+    file = open(self.unitCsvAddress, "w")
     self.writer = csv.writer(file)
     self.writer.writerows(self.records)
     file.close()
@@ -194,7 +194,7 @@ class VsUnitCsv:
     self.records.insert(0, header[0])
 
     # write complete records again to units.csv file
-    file = open(self.unitCsvAddress, "wb")
+    file = open(self.unitCsvAddress, "w")
     self.writer = csv.writer(file)
     self.writer.writerows(self.records)
     file.close()
