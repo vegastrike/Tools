@@ -86,6 +86,7 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
 import tkinter as tk
+import tkinter.ttk as ttk
 import configparser
 import shutil               # for copying file backups
 import os.path              # for path splitting
@@ -464,11 +465,12 @@ class UnitConverter:
 
     def getFolder(self, setstrvar):
     # gets a folder name
-      folder = askdirectory(initialdir=self.vegastrike.get(), title="Select A Folder", mustexist=1)
+      folder = filedialog.askdirectory(initialdir=self.vegastrike.get(), title="Select A Folder", mustexist=1)
       if len(folder) > 0:
         setstrvar.set(folder)
         self.setParameters()
         self.iniWrite()
+        self.loadCsvList()
 
     def getPath(self, setstrvar):
     # get a file and return the full address (path+filename)
@@ -589,73 +591,80 @@ class UnitConverter:
       (dirName, fileName) = os.path.split(self.workdir.get())
       os.chdir(dirName) #change to workdir
 
+    def setVar(self, var, header, value):
+        try:
+            var.set(self.unit[header.index(value)])
+        except ValueError:
+            var.set('')  # clear values not in list, since the new csv files are specialized
+
     def readUnitCsv(self):
     # reads unit.csv and displays information
       if self.vegastrike.get()=='':
         return
-      self.unitcsv = VsUnitCsv(self.vegastrike.get())
+      self.unitcsv = VsUnitCsv(self.vegastrike.get(), vsDataFile=self.csvfile.get())
       if not(self.unitname.get()==''):
         self.unit = self.unitcsv.getUnit(self.unitname.get())
         if len(self.unit)==0:
           self.unit = self.unitcsv.getDefaultUnit(self.unittype.get())
         header = self.unitcsv.getHeader()
-        self.unitdescription.set(self.unit[header.index('Textual_Description')])
+        #self.unitdescription.set(self.unit[header.index('Textual_Description')])
+        self.setVar(self.unitdescription, header, 'Textual_Description')
         self.unitdescr.delete(1.0, END)
         self.unitdescr.insert(INSERT, self.unitdescription.get())
-        self.unittype.set(self.unit[header.index('Object_Type')])
-        self.unitrole.set(self.unit[header.index('Combat_Role')])
-        self.unithud.set(self.unit[header.index('Hud_image')])
-        self.unitscale.set(self.unit[header.index('Unit_Scale')])
-        self.unitcockpit.set(self.unit[header.index('Cockpit')])
-        self.unitmesh.set(self.unit[header.index('Mesh')])
-        self.unitshieldmesh.set(self.unit[header.index('Shield_Mesh')])
-        self.unitsounds.set(self.unit[header.index('Sound')])
-        self.unitthruster.set(self.unit[header.index('Light')])
-        self.unitmass.set(self.unit[header.index('Mass')]) #20
-        self.unitinertia.set(self.unit[header.index('Moment_Of_Inertia')]) #21
-        self.unitfuel.set(self.unit[header.index('Fuel_Capacity')]) #22
-        self.unithull.set(self.unit[header.index('Hull')]) #23
-        self.unitarmor.set(self.unit[header.index('Armor_Front_Top_Right')]) #24
-        self.unitshield.set(self.unit[header.index('Shield_Front_Top_Right')]) #32
-        self.unitshieldquad.set(self.unit[header.index('Shield_Front_Bottom_Right')]) #34
-        self.unitshieldrecharge.set(self.unit[header.index('Shield_Recharge')]) #40
-        self.unitcapacitorprimary.set(self.unit[header.index('Warp_Capacitor')]) #42
-        self.unitcapacitorwarp.set(self.unit[header.index('Primary_Capacitor')])
-        self.unitreactorrecharge.set(self.unit[header.index('Reactor_Recharge')])
-        self.unitjumpdrive.set(self.unit[header.index('Jump_Drive_Present')]) #45
-        self.unitjumpcost.set(self.unit[header.index('Outsystem_Jump_Cost')]) #48
-        self.unitwarpcost.set(self.unit[header.index('Warp_Usage_Cost')])
-        self.unitoverdrivetype.set(self.unit[header.index('Afterburner_Type')]) #50
-        self.unitoverdrivecost.set(self.unit[header.index('Afterburner_Usage_Cost')])
-        self.unitmaneuveryaw.set(self.unit[header.index('Maneuver_Yaw')]) #51
-        self.unitmaneuverpitch.set(self.unit[header.index('Maneuver_Pitch')])
-        self.unitmaneuverroll.set(self.unit[header.index('Maneuver_Roll')])
-        self.unitgovernoryaw.set(self.unit[header.index('Yaw_Governor')]) #55
-        self.unitgovernorpitch.set(self.unit[header.index('Pitch_Governor')])
-        self.unitgovernorroll.set(self.unit[header.index('Roll_Governor')])
-        self.unitoverdriveaccel.set(self.unit[header.index('Afterburner_Accel')]) #58
-        self.unitaccelforward.set(self.unit[header.index('Forward_Accel')]) #59
-        self.unitaccelretro.set(self.unit[header.index('Retro_Accel')])
-        self.unitaccelleft.set(self.unit[header.index('Left_Accel')])
-        self.unitaccelright.set(self.unit[header.index('Right_Accel')])
-        self.unitacceltop.set(self.unit[header.index('Top_Accel')])
-        self.unitaccelbottom.set(self.unit[header.index('Bottom_Accel')])
-        self.unitoverdrive.set(self.unit[header.index('Afterburner_Speed_Governor')]) #65
-        self.unitspeed.set(self.unit[header.index('Default_Speed_Governor')]) #66
-        self.unititts.set(self.unit[header.index('ITTS')]) #67
-        self.unitradarcolor.set(self.unit[header.index('Radar_Color')]) # 68
-        self.unitradarrange.set(self.unit[header.index('Radar_Range')])
-        self.unitconetracking.set(self.unit[header.index('Tracking_Cone')])
-        self.unitconemax.set(self.unit[header.index('Max_Cone')])
-        self.unitconelock.set(self.unit[header.index('Lock_Cone')])
-        self.unitholdvolume.set(self.unit[header.index('Hold_Volume')]) #73
-        self.unitupgrades.set(self.unit[header.index('Upgrades')]) #97
-        self.unitsubunits.set(self.unit[header.index('Sub_Units')]) #99
-        self.unitmounts.set(self.unit[header.index('Mounts')]) #102
-        self.unitdocks.set(self.unit[header.index('Dock')])
-        self.unitcargoimport.set(self.unit[header.index('Cargo_Import')]) # 105
-        self.unitcargo.set(self.unit[header.index('Cargo')]) # 106
-        self.unitupgradevolume.set(self.unit[header.index('Upgrade_Storage_Volume')]) #109
+        self.setVar(self.unittype, header, 'Object_Type')
+        self.setVar(self.unitrole, header, 'Combat_Role')
+        self.setVar(self.unithud, header, 'Hud_image')
+        self.setVar(self.unitscale, header, 'Unit_Scale')
+        self.setVar(self.unitcockpit, header, 'Cockpit')
+        self.setVar(self.unitmesh, header, 'Mesh')
+        self.setVar(self.unitshieldmesh, header, 'Shield_Mesh')
+        self.setVar(self.unitsounds, header, 'Sound')
+        self.setVar(self.unitthruster, header, 'Light')
+        self.setVar(self.unitmass, header, 'Mass') #20
+        self.setVar(self.unitinertia, header, 'Moment_Of_Inertia') #21
+        self.setVar(self.unitfuel, header, 'Fuel_Capacity') #22
+        self.setVar(self.unithull, header, 'Hull') #23
+        self.setVar(self.unitarmor, header, 'Armor_Front_Top_Right') #24
+        self.setVar(self.unitshield, header, 'Shield_Front_Top_Right') #32
+        self.setVar(self.unitshieldquad, header, 'Shield_Front_Bottom_Right') #34
+        self.setVar(self.unitshieldrecharge, header, 'Shield_Recharge') #40
+        self.setVar(self.unitcapacitorprimary, header, 'Warp_Capacitor') #42
+        self.setVar(self.unitcapacitorwarp, header, 'Primary_Capacitor')
+        self.setVar(self.unitreactorrecharge, header, 'Reactor_Recharge')
+        self.setVar(self.unitjumpdrive, header, 'Jump_Drive_Present') #45
+        self.setVar(self.unitjumpcost, header, 'Outsystem_Jump_Cost') #48
+        self.setVar(self.unitwarpcost, header, 'Warp_Usage_Cost')
+        self.setVar(self.unitoverdrivetype, header, 'Afterburner_Type') #50
+        self.setVar(self.unitoverdrivecost, header, 'Afterburner_Usage_Cost')
+        self.setVar(self.unitmaneuveryaw, header, 'Maneuver_Yaw') #51
+        self.setVar(self.unitmaneuverpitch, header, 'Maneuver_Pitch')
+        self.setVar(self.unitmaneuverroll, header, 'Maneuver_Roll')
+        self.setVar(self.unitgovernoryaw, header, 'Yaw_Governor') #55
+        self.setVar(self.unitgovernorpitch, header, 'Pitch_Governor')
+        self.setVar(self.unitgovernorroll, header, 'Roll_Governor')
+        self.setVar(self.unitoverdriveaccel, header, 'Afterburner_Accel') #58
+        self.setVar(self.unitaccelforward, header, 'Forward_Accel') #59
+        self.setVar(self.unitaccelretro, header, 'Retro_Accel')
+        self.setVar(self.unitaccelleft, header, 'Left_Accel')
+        self.setVar(self.unitaccelright, header, 'Right_Accel')
+        self.setVar(self.unitacceltop, header, 'Top_Accel')
+        self.setVar(self.unitaccelbottom, header, 'Bottom_Accel')
+        self.setVar(self.unitoverdrive, header, 'Afterburner_Speed_Governor') #65
+        self.setVar(self.unitspeed, header, 'Default_Speed_Governor') #66
+        self.setVar(self.unititts, header, 'ITTS') #67
+        self.setVar(self.unitradarcolor, header, 'Radar_Color') # 68
+        self.setVar(self.unitradarrange, header, 'Radar_Range')
+        self.setVar(self.unitconetracking, header, 'Tracking_Cone')
+        self.setVar(self.unitconemax, header, 'Max_Cone')
+        self.setVar(self.unitconelock, header, 'Lock_Cone')
+        self.setVar(self.unitholdvolume, header, 'Hold_Volume') #73
+        self.setVar(self.unitupgrades, header, 'Upgrades') #97
+        self.setVar(self.unitsubunits, header, 'Sub_Units') #99
+        self.setVar(self.unitmounts, header, 'Mounts') #102
+        self.setVar(self.unitdocks, header, 'Dock')
+        self.setVar(self.unitcargoimport, header, 'Cargo_Import') # 105
+        self.setVar(self.unitcargo, header, 'Cargo') # 106
+        self.setVar(self.unitupgradevolume, header, 'Upgrade_Storage_Volume') #109
 
         thrusters = self.parseMounts(self.unitthruster.get())
         if len(thrusters)>0: 
@@ -679,85 +688,92 @@ class UnitConverter:
         self.subunittypesource.set('')
         self.updateSubunits()
 
+    def setUnitValue(self, header, key, value):
+        try:
+            self.unit[header.index(key)] = value
+        except ValueError:
+            pass  # just skip values not in list, since the new csv files are specialized
+
     def writeUnitCsv(self):
     # writes unit.csv from current display
       # collect variables from screen editor
-      self.unitcsv = VsUnitCsv(self.vegastrike.get())
+      self.unitcsv = VsUnitCsv(self.vegastrike.get(), vsDataFile=self.csvfile.get())
       header = self.unitcsv.getHeader()
       #print "Header =", header
       if not(self.unitname.get()==''):
         self.unitdescription.set(self.unitdescr.get(1.0, END).replace('\n',''))
         self.unit[0]  = self.unitname.get()
-        if self.unit[header.index('Directory')]=='':
-          if self.useclassdir.get()=='1':
-            self.unit[header.index('Directory')] = './'+self.unittype.get().lower()+'s/'+self.unitname.get()
-          else:
-            self.unit[header.index('Directory')] = './'+self.unitname.get()
-        self.unit[header.index('Name')]  = self.unitname.get()#2
-        self.unit[header.index('Object_Type')]  = self.unittype.get() #4
-        self.unit[header.index('Combat_Role')]  = self.unitrole.get()
-        self.unit[header.index('Textual_Description')]  = self.unitdescription.get()
-        self.unit[header.index('Hud_image')]  = self.unithud.get()
-        self.unit[header.index('Unit_Scale')]  = self.unitscale.get()
-        self.unit[header.index('Cockpit')]  = self.unitcockpit.get()
-        self.unit[header.index('Mesh')]  = self.unitmesh.get() #'{'+self.unitname.get().lower()+'.bfxm;;}' #13
-        self.unit[header.index('Shield_Mesh')] = self.unitshieldmesh.get()
-        self.unit[header.index('Mass')] = self.unitmass.get() #20
-        self.unit[header.index('Moment_Of_Inertia')] = self.unitinertia.get() #21
-        self.unit[header.index('Fuel_Capacity')] = self.unitfuel.get() #22
-        self.unit[header.index('Hull')] = self.unithull.get() #23
-        self.unit[header.index('Armor_Front_Top_Right')] = self.unitarmor.get() #24
-        self.unit[header.index('Armor_Front_Top_Left')] = self.unitarmor.get()
-        self.unit[header.index('Armor_Front_Bottom_Right')] = self.unitarmor.get()
-        self.unit[header.index('Armor_Front_Bottom_Left')] = self.unitarmor.get()
-        self.unit[header.index('Armor_Back_Top_Right')] = self.unitarmor.get() #28
-        self.unit[header.index('Armor_Back_Top_Left')] = self.unitarmor.get()
-        self.unit[header.index('Armor_Back_Bottom_Right')] = self.unitarmor.get()
-        self.unit[header.index('Armor_Back_Bottom_Left')] = self.unitarmor.get()
-        self.unit[header.index('Shield_Front_Top_Right')] = self.unitshield.get() #32
-        self.unit[header.index('Shield_Back_Top_Left')] = self.unitshield.get()
-        self.unit[header.index('Shield_Front_Bottom_Right')] = self.unitshieldquad.get() # 34
-        self.unit[header.index('Shield_Front_Bottom_Left')] = self.unitshieldquad.get()
-        self.unit[header.index('Shield_Recharge')] = self.unitshieldrecharge.get() #40
-        self.unit[header.index('Warp_Capacitor')] = self.unitcapacitorprimary.get() #42
-        self.unit[header.index('Primary_Capacitor')] = self.unitcapacitorwarp.get()
-        self.unit[header.index('Reactor_Recharge')] = self.unitreactorrecharge.get()
-        self.unit[header.index('Jump_Drive_Present')] = self.unitjumpdrive.get() #45
-        self.unit[header.index('Outsystem_Jump_Cost')] = self.unitjumpcost.get() #48
-        self.unit[header.index('Warp_Usage_Cost')] = self.unitwarpcost.get()
-        self.unit[header.index('Afterburner_Type')] = self.unitoverdrivetype.get() #50
-        self.unit[header.index('Afterburner_Usage_Cost')] = self.unitoverdrivecost.get()
-        self.unit[header.index('Maneuver_Yaw')] = self.unitmaneuveryaw.get() #52
-        self.unit[header.index('Maneuver_Pitch')] = self.unitmaneuverpitch.get()
-        self.unit[header.index('Maneuver_Roll')] = self.unitmaneuverroll.get()
-        self.unit[header.index('Yaw_Governor')] = self.unitgovernoryaw.get() #55
-        self.unit[header.index('Pitch_Governor')] = self.unitgovernorpitch.get()
-        self.unit[header.index('Roll_Governor')] = self.unitgovernorroll.get()
-        self.unit[header.index('Afterburner_Accel')] = self.unitoverdriveaccel.get() #58
-        self.unit[header.index('Forward_Accel')] = self.unitaccelforward.get() #59
-        self.unit[header.index('Retro_Accel')] = self.unitaccelretro.get()
-        self.unit[header.index('Left_Accel')] = self.unitaccelleft.get()
-        self.unit[header.index('Right_Accel')] = self.unitaccelright.get()
-        self.unit[header.index('Top_Accel')] = self.unitacceltop.get()
-        self.unit[header.index('Bottom_Accel')] = self.unitaccelbottom.get()
-        self.unit[header.index('Afterburner_Speed_Governor')] = self.unitoverdrive.get() #65
-        self.unit[header.index('Default_Speed_Governor')] = self.unitspeed.get() #66
-        self.unit[header.index('ITTS')] = self.unititts.get() #67
-        self.unit[header.index('Radar_Color')] = self.unitradarcolor.get() # 68
-        self.unit[header.index('Radar_Range')] = self.unitradarrange.get()
-        self.unit[header.index('Tracking_Cone')] = self.unitconetracking.get()
-        self.unit[header.index('Max_Cone')] = self.unitconemax.get()
-        self.unit[header.index('Lock_Cone')] = self.unitconelock.get()
-        self.unit[header.index('Hold_Volume')] = self.unitholdvolume.get() #73
-        self.unit[header.index('Upgrades')] = self.unitupgrades.get() #97
-        self.unit[header.index('Sub_Units')] = self.unitsubunits.get() #99
-        self.unit[header.index('Sound')] = self.unitsounds.get()
-        self.unit[header.index('Light')] = self.unitthruster.get()
-        self.unit[header.index('Mounts')] = self.unitmounts.get()
-        self.unit[header.index('Dock')] = self.unitdocks.get() #104
-        self.unit[header.index('Cargo_Import')] = self.unitcargoimport.get() # 105
-        self.unit[header.index('Cargo')] = self.unitcargo.get() # 106
-        self.unit[header.index('Upgrade_Storage_Volume')] = self.unitupgradevolume.get() #109
+        if 'Directory' in header:
+            if self.unit[header.index('Directory')]=='':
+              if self.useclassdir.get()=='1':
+                self.unit[header.index('Directory')] = './'+self.unittype.get().lower()+'s/'+self.unitname.get()
+              else:
+                self.unit[header.index('Directory')] = './'+self.unitname.get()
+        self.setUnitValue(header, 'Name', self.unitname.get())#2
+        self.setUnitValue(header, 'Object_Type', self.unittype.get()) #4
+        self.setUnitValue(header, 'Combat_Role', self.unitrole.get())
+        self.setUnitValue(header, 'Textual_Description', self.unitdescription.get())
+        self.setUnitValue(header, 'Hud_image', self.unithud.get())
+        self.setUnitValue(header, 'Unit_Scale', self.unitscale.get())
+        self.setUnitValue(header, 'Cockpit', self.unitcockpit.get())
+        self.setUnitValue(header, 'Mesh', self.unitmesh.get()) #'{'+self.unitname.get().lower()+'.bfxm;;}' #13
+        self.setUnitValue(header, 'Shield_Mesh', self.unitshieldmesh.get())
+        self.setUnitValue(header, 'Mass', self.unitmass.get()) #20
+        self.setUnitValue(header, 'Moment_Of_Inertia', self.unitinertia.get()) #21
+        self.setUnitValue(header, 'Fuel_Capacity', self.unitfuel.get()) #22
+        self.setUnitValue(header, 'Hull', self.unithull.get()) #23
+        self.setUnitValue(header, 'Armor_Front_Top_Right', self.unitarmor.get()) #24
+        self.setUnitValue(header, 'Armor_Front_Top_Left', self.unitarmor.get())
+        self.setUnitValue(header, 'Armor_Front_Bottom_Right', self.unitarmor.get())
+        self.setUnitValue(header, 'Armor_Front_Bottom_Left', self.unitarmor.get())
+        self.setUnitValue(header, 'Armor_Back_Top_Right', self.unitarmor.get()) #28
+        self.setUnitValue(header, 'Armor_Back_Top_Left', self.unitarmor.get())
+        self.setUnitValue(header, 'Armor_Back_Bottom_Right', self.unitarmor.get())
+        self.setUnitValue(header, 'Armor_Back_Bottom_Left', self.unitarmor.get())
+        self.setUnitValue(header, 'Shield_Front_Top_Right', self.unitshield.get()) #32
+        self.setUnitValue(header, 'Shield_Back_Top_Left', self.unitshield.get())
+        self.setUnitValue(header, 'Shield_Front_Bottom_Right', self.unitshieldquad.get()) # 34
+        self.setUnitValue(header, 'Shield_Front_Bottom_Left', self.unitshieldquad.get())
+        self.setUnitValue(header, 'Shield_Recharge', self.unitshieldrecharge.get()) #40
+        self.setUnitValue(header, 'Warp_Capacitor', self.unitcapacitorprimary.get()) #42
+        self.setUnitValue(header, 'Primary_Capacitor', self.unitcapacitorwarp.get())
+        self.setUnitValue(header, 'Reactor_Recharge', self.unitreactorrecharge.get())
+        self.setUnitValue(header, 'Jump_Drive_Present', self.unitjumpdrive.get()) #45
+        self.setUnitValue(header, 'Outsystem_Jump_Cost', self.unitjumpcost.get()) #48
+        self.setUnitValue(header, 'Warp_Usage_Cost', self.unitwarpcost.get())
+        self.setUnitValue(header, 'Afterburner_Type', self.unitoverdrivetype.get()) #50
+        self.setUnitValue(header, 'Afterburner_Usage_Cost', self.unitoverdrivecost.get())
+        self.setUnitValue(header, 'Maneuver_Yaw', self.unitmaneuveryaw.get()) #52
+        self.setUnitValue(header, 'Maneuver_Pitch', self.unitmaneuverpitch.get())
+        self.setUnitValue(header, 'Maneuver_Roll', self.unitmaneuverroll.get())
+        self.setUnitValue(header, 'Yaw_Governor', self.unitgovernoryaw.get()) #55
+        self.setUnitValue(header, 'Pitch_Governor', self.unitgovernorpitch.get())
+        self.setUnitValue(header, 'Roll_Governor', self.unitgovernorroll.get())
+        self.setUnitValue(header, 'Afterburner_Accel', self.unitoverdriveaccel.get()) #58
+        self.setUnitValue(header, 'Forward_Accel', self.unitaccelforward.get()) #59
+        self.setUnitValue(header, 'Retro_Accel', self.unitaccelretro.get())
+        self.setUnitValue(header, 'Left_Accel', self.unitaccelleft.get())
+        self.setUnitValue(header, 'Right_Accel', self.unitaccelright.get())
+        self.setUnitValue(header, 'Top_Accel', self.unitacceltop.get())
+        self.setUnitValue(header, 'Bottom_Accel', self.unitaccelbottom.get())
+        self.setUnitValue(header, 'Afterburner_Speed_Governor', self.unitoverdrive.get()) #65
+        self.setUnitValue(header, 'Default_Speed_Governor', self.unitspeed.get()) #66
+        self.setUnitValue(header, 'ITTS', self.unititts.get()) #67
+        self.setUnitValue(header, 'Radar_Color', self.unitradarcolor.get()) # 68
+        self.setUnitValue(header, 'Radar_Range', self.unitradarrange.get())
+        self.setUnitValue(header, 'Tracking_Cone', self.unitconetracking.get())
+        self.setUnitValue(header, 'Max_Cone', self.unitconemax.get())
+        self.setUnitValue(header, 'Lock_Cone', self.unitconelock.get())
+        self.setUnitValue(header, 'Hold_Volume', self.unitholdvolume.get()) #73
+        self.setUnitValue(header, 'Upgrades', self.unitupgrades.get()) #97
+        self.setUnitValue(header, 'Sub_Units', self.unitsubunits.get()) #99
+        self.setUnitValue(header, 'Sound', self.unitsounds.get())
+        self.setUnitValue(header, 'Light', self.unitthruster.get())
+        self.setUnitValue(header, 'Mounts', self.unitmounts.get())
+        self.setUnitValue(header, 'Dock', self.unitdocks.get()) #104
+        self.setUnitValue(header, 'Cargo_Import', self.unitcargoimport.get()) # 105
+        self.setUnitValue(header, 'Cargo', self.unitcargo.get()) # 106
+        self.setUnitValue(header, 'Upgrade_Storage_Volume', self.unitupgradevolume.get()) #109
 
         # write units.csv
         if not(self.unitcsv.updateUnit(self.unit)): # if update fails
@@ -769,8 +785,16 @@ class UnitConverter:
 
     def sortUnitCsv(self):
     # sorts units.csv
-      self.unitcsv = VsUnitCsv(self.vegastrike.get())
+      self.unitcsv = VsUnitCsv(self.vegastrike.get(), vsDataFile=self.csvfile.get())
       self.unitcsv.standardSort()
+
+    def loadCsvList(self):
+        csvs = []
+        for csv in os.listdir(self.vegastrike.get()+'/units'):
+            if csv.lower().endswith('.csv'):
+                csvs.append(csv)
+        csvs.sort()
+        self.csvlist.configure(values=csvs)
 
     def updateModelViewMission(self):
     # updates modelview.mission file with current vessel model and faction
@@ -1510,13 +1534,13 @@ class UnitConverter:
     #reads next unit from units.csv and displays it
       if self.unitname.get()=='':
         print("*"+self.unitname.get()+"#")
-      self.unitcsv = VsUnitCsv(self.vegastrike.get()) # get class instance
+      self.unitcsv = VsUnitCsv(self.vegastrike.get(), vsDataFile=self.csvfile.get()) # get class instance
       self.unitname.set(self.unitcsv.getUnitKey(currentUnitKey=self.unitname.get(), offset=+1))
       self.readUnitCsv()
 
     def getPreviousUnit(self):
     #reads next unit from units.csv and displays it
-      self.unitcsv = VsUnitCsv(self.vegastrike.get()) # get class instance
+      self.unitcsv = VsUnitCsv(self.vegastrike.get(), vsDataFile=self.csvfile.get()) # get class instance
       self.unitname.set(self.unitcsv.getUnitKey(currentUnitKey=self.unitname.get(), offset=-1))
       self.readUnitCsv()
 
@@ -2128,6 +2152,7 @@ class UnitConverter:
       self.unitconetracking = StringVar()
       self.unitconemax = StringVar()
       self.unitconelock = StringVar()
+      self.csvfile = tk.StringVar()
 
       #--------------------------------------------------------------------------------------------
       # WORKSPACE, MODEL OBJ AND MTL FILES
@@ -2343,6 +2368,15 @@ class UnitConverter:
       self.displayTextBox(self.f5, 4, self.help, DISABLED)
       # INFORMATION
       self.displayHeader(f5,"Unit Information") # header line
+      # row
+      iframe = Frame(f5, relief=FLAT)
+      Label(iframe, text="Csv file", width=16).pack(side=LEFT, padx=5)
+      self.csvlist = ttk.Combobox(iframe)
+      self.csvlist.configure(textvariable=self.csvfile)
+      self.csvlist.configure(state='readonly')
+      self.csvlist.pack(side=LEFT, padx=5)
+      Button(iframe, text='Load', bg="#BFB8FE", fg="#483855", command=self.readUnitCsv).pack(side=LEFT, padx=5)
+      iframe.pack(expand=1, fill=X, pady=0, padx=5)
       # row
       iframe = Frame(f5, relief=FLAT)
       Label(iframe, text="Unit name", width=16).pack(side=LEFT, padx=5)
@@ -2788,6 +2822,7 @@ class UnitConverter:
       # EXECUTE
       #--------------------------------------------------------------------------------------------
       self.iniRead()
+      self.loadCsvList()
       self.readUnitCsv()
       self.readUnitUpgrades()
       self.readUnitWeapons()
