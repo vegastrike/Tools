@@ -607,7 +607,6 @@ class UnitConverter:
         if len(self.unit)==0:
           self.unit = self.unitcsv.getDefaultUnit(self.unittype.get())
         header = self.unitcsv.getHeader()
-        #self.unitdescription.set(self.unit[header.index('Textual_Description')])
         self.setVar(self.unitdescription, header, 'Textual_Description')
         self.unitdescr.delete(1.0, END)
         self.unitdescr.insert(INSERT, self.unitdescription.get())
