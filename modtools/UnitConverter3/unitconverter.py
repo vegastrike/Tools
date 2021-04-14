@@ -81,9 +81,7 @@ from vsmission import *
 from vssystem import *
 from png import *
 from tkinter import *
-#from tkFileDialog import *
-#import tkMessageBox
-from tkinter import filedialog
+from tkinter.filedialog import *
 from tkinter import messagebox
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -465,7 +463,7 @@ class UnitConverter:
 
     def getFolder(self, setstrvar):
     # gets a folder name
-      folder = filedialog.askdirectory(initialdir=self.vegastrike.get(), title="Select A Folder", mustexist=1)
+      folder = askdirectory(initialdir=self.vegastrike.get(), title="Select A Folder", mustexist=1)
       if len(folder) > 0:
         setstrvar.set(folder)
         self.setParameters()
@@ -475,7 +473,7 @@ class UnitConverter:
     def getPath(self, setstrvar):
     # get a file and return the full address (path+filename)
       #self.changeToWorkdir()
-      file = filedialog.askopenfilename(initialdir=self.workdir.get(), title="Select A File")
+      file = askopenfilename(initialdir=self.workdir.get(), title="Select A File")
       (dirName, fileName) = os.path.split(file)
       (fileBaseName, fileExtension)=os.path.splitext(fileName)
       if file=='':
@@ -550,7 +548,7 @@ class UnitConverter:
 
     def getFile(self, setstrvar):
     # get a file and return only the filename without path
-      file = filedialog.askopenfilename(initialdir=self.workdir.get(), title="Select A File")
+      file = askopenfilename(initialdir=self.workdir.get(), title="Select A File")
       if file=='':
         return ''
       (dirName, fileName) = os.path.split(file)
@@ -592,14 +590,17 @@ class UnitConverter:
       os.chdir(dirName) #change to workdir
 
     def setVar(self, var, header, value):
-        try:
-            var.set(self.unit[header.index(value)])
-        except ValueError:
-            var.set('')  # clear values not in list, since the new csv files are specialized
+    # sets tk var to value from header if present
+      try:
+        var.set(self.unit[header.index(value)])
+      except ValueError:
+        var.set('')  # clear values not in list, since the new csv files are specialized
 
-    def readUnitCsv(self):
+    def readUnitCsv(self, *args):  # args added to host the event when called via scroll wheel
     # reads unit.csv and displays information
       if self.vegastrike.get()=='':
+        return
+      if not os.path.isfile(self.vegastrike.get() + "/units/" + self.csvfile.get()):
         return
       self.unitcsv = VsUnitCsv(self.vegastrike.get(), vsDataFile=self.csvfile.get())
       if not(self.unitname.get()==''):
@@ -688,10 +689,11 @@ class UnitConverter:
         self.updateSubunits()
 
     def setUnitValue(self, header, key, value):
-        try:
-            self.unit[header.index(key)] = value
-        except ValueError:
-            pass  # just skip values not in list, since the new csv files are specialized
+    # sets unit element to value if present
+      try:
+        self.unit[header.index(key)] = value
+      except ValueError:
+        pass  # just skip values not in list, since the new csv files are specialized
 
     def writeUnitCsv(self):
     # writes unit.csv from current display
@@ -788,12 +790,15 @@ class UnitConverter:
       self.unitcsv.standardSort()
 
     def loadCsvList(self):
-        csvs = []
-        for csv in os.listdir(self.vegastrike.get()+'/units'):
-            if csv.lower().endswith('.csv'):
-                csvs.append(csv)
-        csvs.sort()
-        self.csvlist.configure(values=csvs)
+    # loads the csv combo box with a list of csv files found in the unit directory
+      csvs = []
+      for csv in os.listdir(self.vegastrike.get()+'/units'):
+        if csv.lower().endswith('.csv'):
+          csvs.append(csv)
+      csvs.sort()
+      self.csvlist.configure(values=csvs)
+      if csvs:  # auto select first element if present
+        self.csvlist.current(0)  
 
     def updateModelViewMission(self):
     # updates modelview.mission file with current vessel model and faction
@@ -1937,11 +1942,12 @@ class UnitConverter:
       if len(newValues)==0:
         watchVariable.set("")
         print("ERROR (refreshOptionMenu): empty newValues list given. Setting index to ''.")
-      try:
-        watchVariable.set(newValues[preselectIndex])
-      except:
-        print("ERROR (refreshOptionMenu): wrong index for newValues list. Setting index 0.")
-        watchVariable.set(newValues[0])
+      else:
+        try:
+          watchVariable.set(newValues[preselectIndex])
+        except:
+          print("ERROR (refreshOptionMenu): wrong index for newValues list. Setting index 0.")
+          watchVariable.set(newValues[0])
 
     def resetUnitInfo(self):
     # resets screen variables in unit editor
@@ -2374,7 +2380,7 @@ class UnitConverter:
       self.csvlist.configure(textvariable=self.csvfile)
       self.csvlist.configure(state='readonly')
       self.csvlist.pack(side=LEFT, padx=5)
-      Button(iframe, text='Load', bg="#BFB8FE", fg="#483855", command=self.readUnitCsv).pack(side=LEFT, padx=5)
+      self.csvlist.bind('<<ComboboxSelected>>', self.readUnitCsv)
       iframe.pack(expand=1, fill=X, pady=0, padx=5)
       # row
       iframe = Frame(f5, relief=FLAT)
