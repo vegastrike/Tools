@@ -109,9 +109,10 @@ class VsUnitCsv:
 
   def writeUnitCsv(self):
   # writes complete records again to units.csv file
-    file = open(self.unitCsvAddress, "w")
-    self.writer = csv.writer(file)
-    self.writer.writerows(self.records)
+    file = open(self.unitCsvAddress, "wb")
+    with io.TextIOWrapper(file, encoding='utf-8', newline='') as text_file:
+      self.writer = csv.writer(text_file)
+      self.writer.writerows(self.records)
     file.close()
 
   def getDefaultUnit(self, unittype='Vessel'):
@@ -194,7 +195,7 @@ class VsUnitCsv:
     self.records.insert(0, header[0])
 
     # write complete records again to units.csv file
-    file = open(self.unitCsvAddress, "w")
+    file = open(self.unitCsvAddress, "wb")
     self.writer = csv.writer(file)
     self.writer.writerows(self.records)
     file.close()
