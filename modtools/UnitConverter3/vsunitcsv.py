@@ -39,8 +39,8 @@ import operator
 
 class VsUnitCsv:
 
-  def __init__(self, vsDataDir):
-    self.unitCsvAddress = vsDataDir+"/units/units.csv"
+  def __init__(self, vsDataDir, vsDataFile="units.csv"):
+    self.unitCsvAddress = vsDataDir+"/units/"+vsDataFile
     #self.recordcnt = 0
     self.records = []
 
@@ -110,8 +110,9 @@ class VsUnitCsv:
   def writeUnitCsv(self):
   # writes complete records again to units.csv file
     file = open(self.unitCsvAddress, "wb")
-    self.writer = csv.writer(file)
-    self.writer.writerows(self.records)
+    with io.TextIOWrapper(file, encoding='utf-8', newline='') as text_file:
+      self.writer = csv.writer(text_file)
+      self.writer.writerows(self.records)
     file.close()
 
   def getDefaultUnit(self, unittype='Vessel'):
